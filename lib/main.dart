@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:movify/screens/account/about_page.dart';
+import 'package:movify/screens/account/account_detail_page.dart';
+import 'package:movify/screens/account/contact_us_page.dart';
+import 'package:movify/screens/account/privacy_policy.dart';
+import 'package:movify/screens/account/terms_of_service_page.dart';
 import 'package:movify/screens/auth/login_page.dart';
 import 'package:movify/screens/home/home_page.dart';
-import 'package:movify/screens/movie/detail_movie_page.dart';
+import 'package:movify/screens/main_screen.dart';
 
 void main() async {
   await dotenv.load();
@@ -17,11 +22,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Movify App',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/detailMovie',
+      initialRoute: '/',
       routes: {
+        '/': (context) => MainScreen(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
-        '/detailMovie': (context) => const DetailMovie(),
+        '/about': (context) => const AboutUsPage(),
+        '/account-detail': (context) => const AccountDetailPage(),
+        '/faq': (context) => const ToSPage(),
+        '/contact-us': (context) => const ContacUsPage(),
+        '/privacy-policy': (context) => const PrivacyPolicyPage(),
       },
     );
   }

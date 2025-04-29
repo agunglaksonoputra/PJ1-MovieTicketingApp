@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:movify/screens/movie/detail_movie_page.dart';
 
-class MovieCardVertical extends StatelessWidget {
+class MovieCardRating extends StatelessWidget {
+  final int id;
   final String title;
   final String posterUrl;
   final String rating;
 
-  const MovieCardVertical({
+  const MovieCardRating({
     Key? key,
+    required this.id,
     required this.title,
     required this.posterUrl,
     required this.rating,
@@ -15,7 +18,14 @@ class MovieCardVertical extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailMovie(id: id),
+          ),
+        );
+      },
       child: Container(
         width: 200,
         child: Column(

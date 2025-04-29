@@ -15,6 +15,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: BackButtonIcon(),
+          iconSize: 30.0,
+          onPressed: () => Navigator.pop(context),
+          color: Colors.white,
+        ),
+        backgroundColor: Color(0xFF205979),
+      ),
       backgroundColor: Color(0xFF205979),
       body: SafeArea(
         child: Padding(
@@ -218,7 +227,9 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(color: Colors.white),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            // Navigator.pushNamed(context, route);
+          },
           child: Text(
             'REGISTER NOW!',
             style: TextStyle(
