@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final MovieService movieService = MovieService();
   List<Movie> _nowPlayingMovies = [];
   List<Movie> _mostPopularMovies = [];
@@ -22,12 +22,27 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     loadMovies();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      loadMovies();
+    }
   }
 
   void loadMovies() async {
     final movies = await movieService.NowPlaying();
     final mostPopular = await movieService.MostPopular();
+    if (!mounted) return;
     setState(() {
       _nowPlayingMovies = movies;
       _mostPopularMovies = mostPopular;

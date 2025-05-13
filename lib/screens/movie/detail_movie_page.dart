@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:movify/models/movie_model.dart';
 import 'package:movify/services/movie_service.dart';
 
@@ -58,12 +59,11 @@ class _DetailMovieState extends State<DetailMovie> {
                         color: Colors.black.withOpacity(0.5),
                         shape: BoxShape.circle,
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                      child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: FaIcon(FontAwesomeIcons.angleLeft, color: Colors.white),
                       ),
+                      
                     ),
                   ),
                 ],

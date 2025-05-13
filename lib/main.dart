@@ -6,8 +6,10 @@ import 'package:movify/screens/account/contact_us_page.dart';
 import 'package:movify/screens/account/privacy_policy.dart';
 import 'package:movify/screens/account/terms_of_service_page.dart';
 import 'package:movify/screens/auth/login_page.dart';
+import 'package:movify/screens/auth/register_page.dart';
 import 'package:movify/screens/home/home_page.dart';
 import 'package:movify/screens/main_screen.dart';
+import 'package:movify/screens/menu/menu_page.dart';
 
 void main() async {
   await dotenv.load();
@@ -26,7 +28,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MainScreen(),
         '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
         '/home': (context) => const HomePage(),
+        '/menu': (context) => const MenuPage(),
         '/about': (context) => const AboutUsPage(),
         '/account-detail': (context) => const AccountDetailPage(),
         '/faq': (context) => const ToSPage(),
