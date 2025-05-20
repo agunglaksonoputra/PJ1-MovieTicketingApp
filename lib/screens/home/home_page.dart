@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final MovieService movieService = MovieService();
   List<Movie> _nowPlayingMovies = [];
   List<Movie> _mostPopularMovies = [];
+  String _selectedCity = 'Bandung';
 
   @override
   void initState() {
@@ -40,13 +41,73 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void loadMovies() async {
-    final movies = await movieService.NowPlaying();
-    final mostPopular = await movieService.MostPopular();
+    final movies = await movieService.fetchNowPlaying();
+    final mostPopular = await movieService.fetchMoviePopuler();
     if (!mounted) return;
     setState(() {
       _nowPlayingMovies = movies;
       _mostPopularMovies = mostPopular;
     });
+  }
+
+  void _showCityBottomSheet(BuildContext context) {
+    final List<String> cities = ['Jakarta', 'Surabaya', 'Bandung', 'Yogyakarta', 'Medan'];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Pilih Kota',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pop(context); // Menutup modal bottom sheet
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Daftar kota
+              Padding(
+                padding: EdgeInsets.only(bottom: 30),
+                child: Column(
+                  children: cities.map((city) {
+                    return ListTile(
+                      title: Text(city),
+                      trailing: _selectedCity == city
+                          ? Icon(Icons.check, color: Colors.blue) // Menambahkan ikon check jika kota dipilih
+                          : null,
+                      onTap: () {
+                        // Menutup modal bottom sheet dan mengupdate kota yang dipilih
+                        Navigator.pop(context);
+                        setState(() {
+                          _selectedCity = city;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -83,7 +144,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           IconButton(
             icon: FaIcon(FontAwesomeIcons.locationDot),
             iconSize: 24,
-            onPressed: () {},
+              onPressed: () => _showCityBottomSheet(context),
           ),
         ],
       ),
@@ -126,6 +187,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             title: movie.title,
                             posterUrl: movie.posterUrl,
                             rating: movie.ratingAverage,
+                            city: _selectedCity,
                           ),
                         );
                       },
@@ -157,7 +219,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MenuPage(),
+                                builder: (context) => MenuPage(city: _selectedCity),
                               ),
                             );
                           },
@@ -191,6 +253,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             title: movie.title,
                             posterUrl: movie.posterUrl,
                             rating: movie.ratingAverage,
+                            city: _selectedCity
                           ),
                         );
                       },

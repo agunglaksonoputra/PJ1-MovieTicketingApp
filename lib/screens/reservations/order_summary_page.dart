@@ -1,43 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:movify/models/movie_model.dart';
+import 'package:movify/models/theater_model.dart';
+import 'package:movify/screens/movie/detail_movie_page.dart';
+import 'package:movify/services/movie_service.dart';
 
-void main() {
-  runApp(const mainApp());
-}
-
-class mainApp extends StatelessWidget {
-  const mainApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Order Summary',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const OrderSummaryPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
+import '../../models/cinema_model.dart';
+import '../../models/schedule_model.dart';
 
 class OrderSummaryPage extends StatefulWidget {
-  const OrderSummaryPage({super.key});
+  final Map<String, dynamic> data;
+
+  const OrderSummaryPage({
+    super.key,
+    required this.data
+  });
 
   @override
   State<StatefulWidget> createState() => _OrderSummaryPageState();
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
+  final MovieService movieService = MovieService();
+
+  final double convenienceFee = 500;
+
+  late Movie movie;
+  late Theater theater;
+  late Cinema cinema;
+  late Schedule schedule;
+  late List<Map<String, dynamic>> seats;
+
+  // Movie? _detailMovie;
+
+  void initState() {
+    super.initState();
+
+    movie = widget.data['movie'];
+    theater = widget.data['theater'];
+    cinema = widget.data['cinema'];
+    schedule = widget.data['schedule'];
+    seats = widget.data['seats'];
+
+    // loadAPI();
+  }
+
+  // void loadAPI() async {
+  //   final movie = await movieService.getMovieById(movie.id);
+  //   setState(() {
+  //     _detailMovie = movie;
+  //   });
+  // }
+  String formatRupiah(double value) {
+    // Buang digit desimal dengan toInt()
+    int intValue = value.toInt();
+
+    // Format angka dengan titik sebagai pemisah ribuan
+    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+    final rupiah = intValue.toString().replaceAllMapped(reg, (Match match) => '${match[1]}.');
+
+    return 'Rp$rupiah';
+  }
+
   @override
   Widget build(BuildContext context) {
+    double totalPayment = (schedule.price + convenienceFee) * seats.length;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: FaIcon(FontAwesomeIcons.angleLeft),
           iconSize: 30.0,
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            int count = 0;
+            Navigator.popUntil(
+              context,
+                  (route) => count++ == 2,
+            );
+          },
         ),
         title: Text(
           'Order Summary',
@@ -61,7 +101,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.grey[300],
                         image: DecorationImage(
-                          image: NetworkImage('https://via.placeholder.com/80x120'),
+                          image: NetworkImage(movie.posterUrl),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -72,7 +112,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Pembantaian Dukun Santet',
+                            movie.title,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -84,7 +124,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                               children: [
                                 Icon(Icons.star, color: Colors.amber, size: 18),
                                 Text(
-                                  '9.2/10',
+                                  movie.ratingAverage,
                                   style: TextStyle(
                                     color: Colors.grey[600],
                                     fontSize: 14,
@@ -95,14 +135,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'CGV 23 Paskal Shopping Center',
+                            cinema.name,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
                           ),
                           Text(
-                            'Studio 1',
+                            theater.name,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -110,7 +150,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Sunday, 10 march 2024, 12:30',
+                            '${schedule.formattedFullDate}, ${schedule.formattedStartTime}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 14,
@@ -155,12 +195,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     Row(
                       children: [
                         Text(
-                          '1 TICKET',
+                          '${seats.length} TICKET',
                           style: TextStyle(fontSize: 14),
                         ),
                         Spacer(),
                         Text(
-                          'F34',
+                          '${seats.map((seat) => seat['seat_label']).join(', ')}',
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -176,11 +216,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         Row(
                           children: [
                             Text(
-                              'Rp48.000',
+                              formatRupiah(schedule.price),
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              ' x 1',
+                              ' x ${seats.length}',
                               style: TextStyle(fontSize: 14),
                             ),
                           ],
@@ -210,11 +250,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         Row(
                           children: [
                             Text(
-                              'Rp4.000',
+                              formatRupiah(convenienceFee),
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              ' x 1',
+                              ' x ${seats.length}',
                               style: TextStyle(fontSize: 14),
                             ),
                           ],
@@ -232,7 +272,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         Row(
                           children: [
                             Text(
-                              'Rp52.000',
+                              formatRupiah(totalPayment),
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                             ),
 
@@ -257,30 +297,34 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  // Select payment method
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1A4168),
-                  foregroundColor: Colors.yellow,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  minimumSize: Size(double.infinity, 50),
-                ),
-                child: Text(
-                  'SELECT PAYMENT METHOD',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2A3663),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+              ),
+              child: const Text('SELECT PAYMENT METHOD'),
+            ),
+          ),
+          Container(
+            height: 30,
+            width: double.infinity,
+            color: Colors.white,
+          ),
+        ],
       ),
     );
   }

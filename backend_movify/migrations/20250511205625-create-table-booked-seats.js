@@ -11,8 +11,20 @@ module.exports = {
       },
       booking_id: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        references: {
+          model: 'bookings',
+          key: 'id'
+        }
       },
+      schedule_id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'schedules',
+            key: 'id'
+          },
+        },
       seat_id: {
         type: Sequelize.INTEGER,
         allowNull: false,

@@ -21,5 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
+    Seat.associate = (models) => {
+        Seat.hasOne(models.BookedSeat, { foreignKey: 'seat_id' });
+    };
+
     return Seat;
 };

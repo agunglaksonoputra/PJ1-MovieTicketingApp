@@ -47,5 +47,9 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: true
     });
 
+    Booking.associate = (models) => {
+        Booking.hasMany(models.BookedSeat, { foreignKey: 'booking_id' });
+    };
+
     return Booking;
 };

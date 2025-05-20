@@ -7,7 +7,8 @@ import 'package:movify/services/movie_service.dart';
 enum MovieFilter { mostPopular, nowPlaying, upcoming }
 
 class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+  final String city;
+  const MenuPage({super.key, required this.city});
 
   @override
   State<StatefulWidget> createState() => _MenuPageState();
@@ -29,10 +30,10 @@ class _MenuPageState extends State<MenuPage> {
 
     switch (filter) {
       case MovieFilter.mostPopular:
-        movies = await movieService.MostPopular();
+        movies = await movieService.fetchMoviePopuler();
         break;
       case MovieFilter.nowPlaying:
-        movies = await movieService.NowPlaying();
+        movies = await movieService.fetchNowPlaying();
         break;
       case MovieFilter.upcoming:
         movies = await movieService.Upcoming();
@@ -89,6 +90,7 @@ class _MenuPageState extends State<MenuPage> {
                     title: movie.title,
                     posterUrl: movie.posterUrl,
                     rating: movie.ratingAverage,
+                    city: widget.city
                   );
                 },
               ),

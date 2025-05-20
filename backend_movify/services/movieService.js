@@ -11,15 +11,24 @@ const getPopular = async () => {
             vote_count: {
                 [Op.ne]: 0
             },
-            original_language: {
-                [Op.in]: ['id', 'en', 'th']
-            }
         },
-        order: [['release_date', 'DESC']]
+        order: [['tmdb_popularity', 'DESC']]
+    });
+}
+
+const getNowPlaying = async () => {
+    return await Movie.findAll({
+        where: {
+            vote_count: {
+                [Op.ne]: 0
+            },
+        },
+        order: [['vote_average', 'DESC']]
     });
 }
 
 module.exports = {
     getAllMovies,
-    getPopular
+    getPopular,
+    getNowPlaying
 };

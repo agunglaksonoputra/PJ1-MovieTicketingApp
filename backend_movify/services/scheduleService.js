@@ -16,6 +16,16 @@ const getScheduleByCinema = async (cinemaId) => {
     });
 };
 
+const getScheduleByTheater = async (theaterId, filmId) => {
+  return await Schedule.findAll({
+    where: {
+      theater_id: theaterId,
+      film_id: filmId
+    }
+  });
+};
+
 module.exports = {
-  getScheduleByCinema  
+  getScheduleByCinema,
+  getScheduleByTheater 
 };
