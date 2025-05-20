@@ -6,6 +6,7 @@ class MovieCardRating extends StatelessWidget {
   final String title;
   final String posterUrl;
   final String rating;
+  final String city;
 
   const MovieCardRating({
     Key? key,
@@ -13,6 +14,7 @@ class MovieCardRating extends StatelessWidget {
     required this.title,
     required this.posterUrl,
     required this.rating,
+    required this.city
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class MovieCardRating extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailMovie(id: id),
+            builder: (context) => DetailMovie(city: city, id: id),
           ),
         );
       },

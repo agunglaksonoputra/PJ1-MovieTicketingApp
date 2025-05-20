@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: BackButtonIcon(),
+          icon: FaIcon(FontAwesomeIcons.angleLeft),
           iconSize: 30.0,
           onPressed: () => Navigator.pop(context),
           color: Colors.white,
@@ -42,24 +43,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 50),
-                _buildEmailField(),
+                _buildTextField('Email', 'Input your email address', null),
                 const SizedBox(height: 20),
-                _buildPasswordField(),
+                _buildTextField('Password', 'Input your email password', null),
                 const SizedBox(height: 10),
                 _buildRememberMeAndForgotPassword(),
                 const SizedBox(height: 20),
                 _buildContinueButton(),
-                const SizedBox(height: 15),
-                const Text(
-                  'Or',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                const SizedBox(height: 15),
-                _buildSocialLoginButton(
-                  'CONTINUE WITH GOOGLE',
-                  Icons.g_mobiledata,
-                  Colors.red.shade400,
-                ),
                 const SizedBox(height: 30),
                 _buildRegisterNow(),
               ],
@@ -70,65 +60,27 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildTextField(String label, String hint, TextEditingController? controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Email Address',
+        Text(
+          label,
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: const TextField(
+          child: TextField(
+            controller: controller,
             decoration: InputDecoration(
-              hintText: 'Input your email address',
+              hintText: hint,
               hintStyle: TextStyle(color: Colors.grey),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Password',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: TextField(
-            obscureText: _obscureText,
-            decoration: InputDecoration(
-              hintText: 'Input your password',
-              hintStyle: const TextStyle(color: Colors.grey),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              ),
             ),
           ),
         ),
@@ -149,7 +101,8 @@ class _LoginPageState extends State<LoginPage> {
                   _rememberMe = value ?? false;
                 });
               },
-              fillColor: MaterialStateProperty.all(Colors.white),
+              fillColor: WidgetStateProperty.all(Colors.white),
+              side: BorderSide.none,
               checkColor: const Color(0xFF1D556A),
             ),
             const Text(
@@ -193,31 +146,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildSocialLoginButton(String text, IconData icon, Color color) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        icon: Icon(icon, color: Colors.white),
-        label: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildRegisterNow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -226,9 +154,9 @@ class _LoginPageState extends State<LoginPage> {
           "Don't have an account yet? ",
           style: TextStyle(color: Colors.white),
         ),
-        TextButton(
-          onPressed: () {
-            // Navigator.pushNamed(context, route);
+        InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, '/register');
           },
           child: Text(
             'REGISTER NOW!',

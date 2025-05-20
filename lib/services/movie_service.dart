@@ -5,6 +5,7 @@ import 'package:movify/models/movie_model.dart';
 
 class MovieService {
   final String _baseUrl = 'https://api.themoviedb.org/3' ?? '';
+  final String _baserURL = dotenv.env['BASE_URL']!;
   final String _apiKey = dotenv.env['TMDB_API_KEY'] ?? '';
 
   Future<List<Movie>> NowPlaying() async {
@@ -97,4 +98,41 @@ class MovieService {
       throw Exception('Failed to load certification');
     }
   }
+
+  Future<Movie> fetchMovies(int movieId, String city) async {
+    final response = await http.get(Uri.parse('$_baserURL/cinema/movie/$movieId/$city'));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      return Movie.fromJson(data);
+    } else {
+      throw Exception('Gagal memuat data film');
+    }
+  }
+
+  Future<List<Movie>> fetchMoviePopuler() async {
+    final response = await http.get(Uri.parse('$_baserURL/movie/popular'));
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load movie detail');
+    }
+
+    final List<dynamic> data = jsonDecode(response.body);
+
+    return data.map((e) => Movie.fromJson(e)).take(4).toList();
+  }
+
+  Future<List<Movie>> fetchNowPlaying() async {
+    final response = await http.get(Uri.parse('$_baserURL/movie/now_playing'));
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load movie detail');
+    }
+
+    final List<dynamic> data = jsonDecode(response.body);
+
+    return data.map((e) => Movie.fromJson(e)).take(4).toList();
+  }
+
 }

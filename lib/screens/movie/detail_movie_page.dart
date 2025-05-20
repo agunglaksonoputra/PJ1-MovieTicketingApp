@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:movify/models/movie_model.dart';
+import 'package:movify/models/schedule_model.dart';
+import 'package:movify/models/theater_model.dart';
+import 'package:movify/screens/reservations/seat_selection.dart';
+import 'package:movify/services/cinema_service.dart';
 import 'package:movify/services/movie_service.dart';
+
+import '../../models/cinema_model.dart';
 
 class DetailMovie extends StatefulWidget{
   final int id;
-  const DetailMovie({super.key, required this.id});
+  final String city;
+  const DetailMovie({
+    super.key,
+    required this.id,
+    required this.city
+  });
 
   @override
   State<StatefulWidget> createState() => _DetailMovieState();
@@ -12,18 +24,22 @@ class DetailMovie extends StatefulWidget{
 
 class _DetailMovieState extends State<DetailMovie> {
   final MovieService movieService = MovieService();
+  final CinemaService cinemaService = CinemaService();
   Movie? _detailMovie;
+  List<Cinema> _cinemas = [];
 
   @override
   void initState() {
     super.initState();
-    loadMovies();
+    loadAPI();
   }
 
-  void loadMovies() async {
+  void loadAPI() async {
     final movie = await movieService.getMovieById(widget.id);
+    final cinemas = await cinemaService.getCinemasShowingMovie(widget.city, widget.id);
     setState(() {
       _detailMovie = movie;
+      _cinemas = cinemas;
     });
   }
 
@@ -35,7 +51,7 @@ class _DetailMovieState extends State<DetailMovie> {
         child: _detailMovie == null
             ? Center(
           child: CircularProgressIndicator(),
-        ) // Menampilkan indikator loading jika data belum ada
+        )
             : SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,6 +64,15 @@ class _DetailMovieState extends State<DetailMovie> {
                     child: Image.network(
                       _detailMovie!.backdropUrl,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 250,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(Icons.image_not_supported, size: 50),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   Positioned(
@@ -59,7 +84,7 @@ class _DetailMovieState extends State<DetailMovie> {
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: const FaIcon(FontAwesomeIcons.angleLeft, color: Colors.white),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -82,7 +107,7 @@ class _DetailMovieState extends State<DetailMovie> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Ratting
                     Row(
@@ -102,7 +127,7 @@ class _DetailMovieState extends State<DetailMovie> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
                     // Genre
                     Wrap(
@@ -165,25 +190,6 @@ class _DetailMovieState extends State<DetailMovie> {
                             ),
                           ],
                         ),
-                        // Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
-                        //     Text(
-                        //       'Duration',
-                        //       style: TextStyle(
-                        //           fontSize: 16,
-                        //           color: Colors.grey.shade600
-                        //       ),
-                        //     ),
-                        //     Text(
-                        //       _detailMovie!.runtimeFormatted,
-                        //       style: TextStyle(
-                        //         fontSize: 16,
-                        //         fontWeight: FontWeight.w500,
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
                       ],
                     ),
                   ],
@@ -206,43 +212,26 @@ class _DetailMovieState extends State<DetailMovie> {
                         ],
                       ),
                       SizedBox(height: 8),
-                      Builder(
-                        builder: (BuildContext context) {
-                          final TabController tabController = DefaultTabController.of(context);
-                          return AnimatedBuilder(
-                            animation: tabController,
-                            builder: (context, child) {
-                              return IndexedStack(
-                                index: tabController.index,
-                                children: [
-                                  // Tab Schedule
-                                  Visibility(
-                                    visible: tabController.index == 0,
-                                    maintainState: true,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
-                                      child: Center(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.calendar_month, size: 64),
-                                            Text('Schedule content here'),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // Tab Details
-                                  Visibility(
-                                    visible: tabController.index == 1,
-                                    maintainState: true,
-                                    child: _buildDetail(_detailMovie!.overview),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
+                      Container(
+                        height: 400,
+                        child: TabBarView(
+                          children: [
+                            // Tab Schedule
+                            _cinemas.isEmpty
+                                ? const Center(
+                              child: Text("Tidak ada jadwal untuk kota ini."),
+                            )
+                                : ListView.builder(
+                              itemCount: _cinemas.length,
+                              itemBuilder: (context, index) {
+                                final cinema = _cinemas[index];
+                                return ExpansionTileCard(cinema: cinema, movie: _detailMovie!);
+                              },
+                            ),
+                            // Tab Detail
+                            _buildDetail(_detailMovie!.overview),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -273,6 +262,92 @@ class _DetailMovieState extends State<DetailMovie> {
           textAlign: TextAlign.justify,
         ),
       ],
+    );
+  }
+}
+
+class ExpansionTileCard extends StatelessWidget {
+  final Cinema cinema;
+  final Movie movie;
+
+  const ExpansionTileCard({
+    super.key,
+    required this.cinema,
+    required this.movie
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (cinema.theater.isEmpty) {
+      return Center(child: Text("Tidak ada jadwal di ${cinema.name}"));
+    }
+
+    return Card(
+      elevation: 2,
+      color: Color(0xFFc7e2f0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: ExpansionTile(
+          title: Text(
+            cinema.name,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          expandedAlignment: Alignment.topLeft,
+          childrenPadding: EdgeInsets.fromLTRB(16, 0, 16, 20),
+          children: cinema.theater.map((theater) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      theater.name,
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      theater.schedule.first.formattedPrice,
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: theater.schedule.map((schedule) {
+                    return ActionChip(
+                      label: Text(schedule.formattedStartTime),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SeatSelectionPage(
+                                theaterId: theater.id,
+                                scheduleId: schedule.id,
+                                data:  {
+                                  'movie': movie,
+                                  'theater': theater,
+                                  'cinema': cinema,
+                                  'schedule': schedule,
+                                },
+                              )
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }

@@ -21,98 +21,101 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ),
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: [
-              _buildSectionPage('Account Detail', '/account-detail'),
-              SizedBox(height: 8),
-              _buildSectionPage('About Us', '/about'),
-              SizedBox(height: 8),
-              _buildSectionPage('Terms of service', '/faq'),
-              SizedBox(height: 8),
-              _buildSectionPage('Privacy Policy', '/privacy-policy'),
-              SizedBox(height: 8),
-              _buildSectionPage('Contact Us', '/contact-us'),
-              SizedBox(height: 34),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                      width: 2.0,
-                      color: Colors.grey.shade500
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _buildSectionPage('Account Detail', '/account-detail'),
+                SizedBox(height: 8),
+                _buildSectionPage('About Us', '/about'),
+                SizedBox(height: 8),
+                _buildSectionPage('Terms of service', '/faq'),
+                SizedBox(height: 8),
+                _buildSectionPage('Privacy Policy', '/privacy-policy'),
+                SizedBox(height: 8),
+                _buildSectionPage('Contact Us', '/contact-us'),
+                SizedBox(height: 34),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        width: 2.0,
+                        color: Colors.grey.shade500
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'App Version',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        'Beta 1.1',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'App Version',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                SizedBox(height: 8),
+                // Button Login
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFF205979),
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    Text(
-                      'Beta 1.1',
+                    child: Text(
+                      'Login',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Colors.grey,
+                        color: Colors.white,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 8),
-              // Button Login
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Color(0xFF205979),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                   ),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
+                ),
+                SizedBox(height: 8),
+                // Button Logout
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Log Out',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8),
-              // Button Logout
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    'Log Out',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
 
-            ],
+              ],
+            ),
           ),
         ),
       ),

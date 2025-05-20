@@ -69,9 +69,9 @@ class Movie {
       posterPath: json['poster_path'] ?? '',
       backdropPath: json['backdrop_path'] ?? '',
       releaseDate: json['release_date'] ?? '',
-      ratingAvg: json['vote_average'],
+      ratingAvg: double.tryParse(json['vote_average'].toString()) ?? 0.0,
       ratingCount: json['vote_count'],
-      view: json['popularity'],
+      view:  double.tryParse(json['popularity'].toString()) ?? 0.0,
       runtime: json['runtime'] ?? 0,
       originalLanguage: json['original_language'] ?? '',
       genres: (json['genres'] as List<dynamic>?)
